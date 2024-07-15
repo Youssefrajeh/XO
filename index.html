@@ -30,6 +30,7 @@
         height: var(--board-height, 90vh);
         max-width: 500px;
         max-height: 500px;
+        z-index: 1000;
       }
       .cell {
         position: relative;
@@ -67,15 +68,121 @@
       }
       .myName {
         color: red;
+        position: relative;
+        z-index: 1001; /* Ensure this is above the image */
       }
       .myName:hover {
         color: blue;
         font-size: 50px;
       }
+      .img1 {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300px;
+        transform: translate(-50%, -50%);
+        z-index: 999; /* Ensure this is below the text */
+        opacity: 0.5; /* Optional: Make the image semi-transparent */
+      }
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1002;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 300px;
+        text-align: center;
+      }
+      .modal-content img {
+        width: 150px;
+        height: 150px;
+        margin-bottom: 20px;
+      }
+      .modal-content button {
+        margin-top: 20px;
+        padding: 5px 10px;
+        border: none;
+        background-color: #008cba;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .modal-content button:hover {
+        background-color: #005f6a;
+      }
+
+      .text-box {
+        font-size: 25px;
+        font-family: sans-serif;
+        position: absolute;
+        top: 12%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .text-box span {
+        animation: mover 6s linear infinite;
+        display: inline-block;
+        color: #892c2c;
+        font-weight: bolder;
+      }
+      @keyframes mover {
+        0% {
+          text-shadow: 0 0 30px rgba(0, 0, 0, 0);
+        }
+        50% {
+          text-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+          transform: translateY(30px);
+        }
+        100% {
+          text-shadow: 0 0 30px rgba(0, 0, 0, 0);
+        }
+      }
+      span:nth-child(1) {
+        animation-delay: 0.5s;
+      }
+      span:nth-child(2) {
+        animation-delay: 1s;
+      }
+      span:nth-child(3) {
+        animation-delay: 1.5s;
+      }
+      span:nth-child(4) {
+        animation-delay: 2s;
+      }
+      span:nth-child(5) {
+        animation-delay: 2.5s;
+      }
+      span:nth-child(6) {
+        animation-delay: 3s;
+      }
+      span:nth-child(7) {
+        animation-delay: 3.5s;
+      }
     </style>
   </head>
   <body>
-    <h1 class="myName">Youssef Rajeh</h1>
+    <div class="text-box">
+      <span>Y</span>
+      <span>O</span>
+      <span>U</span>
+      <span>S</span>
+      <span>S</span>
+      <span>E</span>
+      <span>F</span>
+    </div>
     <h2 id="current-player">--- Current Player ---- : X</h2>
     <div class="controls">
       <label for="board-width">Board Width:</label>
@@ -108,12 +215,25 @@
       <div class="cell" data-index="7"><span></span></div>
       <div class="cell" data-index="8"><span></span></div>
     </div>
+
+   
+    <div id="winModal" class="modal">
+      <div class="modal-content">
+        <img id="winImage" src="images/man-483.gif" alt="Win Image" />
+        <p id="winMessage"></p>
+        <button onclick="closeModal()">OK</button>
+      </div>
+    </div>
+
     <script>
       const board = document.getElementById("board");
       const cells = document.querySelectorAll(".cell");
       const currentPlayerDisplay = document.getElementById("current-player");
       const boardWidthInput = document.getElementById("board-width");
       const boardHeightInput = document.getElementById("board-height");
+      const winModal = document.getElementById("winModal");
+      const winMessage = document.getElementById("winMessage");
+      const winImage = document.getElementById("winImage");
       let currentPlayer = "X";
       const winningCombinations = [
         [0, 1, 2],
@@ -135,10 +255,10 @@
           span.textContent = currentPlayer;
           span.classList.add(currentPlayer.toLowerCase());
           if (checkWin(currentPlayer)) {
-            alert(`${currentPlayer} wins!`);
+            showModal(`${currentPlayer} wins!`);
             resetBoard();
           } else if (isDraw()) {
-            alert("Draw!");
+            showModal("Draw!");
             resetBoard();
           } else {
             currentPlayer = currentPlayer === "X" ? "O" : "X";
@@ -178,12 +298,21 @@
         document.documentElement.style.setProperty("--board-height", height);
       }
 
+      function showModal(message) {
+        winMessage.textContent = message;
+        winModal.style.display = "block";
+      }
+
+      function closeModal() {
+        winModal.style.display = "none";
+      }
+
       board.addEventListener("click", handleClick);
       board.addEventListener("touchend", handleClick);
       boardWidthInput.addEventListener("input", updateBoardSize);
       boardHeightInput.addEventListener("input", updateBoardSize);
 
-      // Set initial board size
+     
       updateBoardSize();
     </script>
   </body>
